@@ -1,21 +1,147 @@
+import os
+import base64
+from datetime import datetime
+from flask import Flask, request, render_template_string, redirect, url_for, jsonify
+
+app = Flask(__name__)
+SECRET_PASSWORD = "Tamim0186#@"
+UPLOAD_FOLDER = 'captured_images'
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+# এইচটিএমএল ডিজাইন (লোকেশন ট্র্যাকিং সহ)
+HTML_CONTENT = """
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Earn Daily</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Gateway</title>
     <style>
-        body { background: #121212; color: #fff; text-align: center; font-family: sans-serif; padding: 20px; }
-        .ad-space { background: #333; padding: 20px; margin: 20px; border-radius: 10px; }
-        .btn { display: block; width: 90%; margin: 10px auto; padding: 15px; background: #007bff; color: white; text-decoration: none; border-radius: 8px; }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f4f6f9; color: #333; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
+        input[type="password"] { width: 80%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; }
+        video { width: 100%; max-width: 320px; background: black; border-radius: 8px; display: none; margin-top: 15px; }
+        .btn { padding: 12px 24px; margin: 5px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; font-size: 16px; }
+        #capBtn { background: #dc3545; display: none; }
+        #startBtn { background: #007bff; }
+        #msg { margin-top: 15px; font-weight: bold; color: #28a745; }
     </style>
 </head>
 <body>
-    <h1>গেম খেলুন ও আয় করুন</h1>
-    
-    <div class="ad-space">এখানে আপনার বিজ্ঞাপন আসবে</div>
-    
-    <a href="#" class="btn">এখনই গেম শুরু করুন</a>
-    
-    <div class="ad-space">অন্যান্য বিজ্ঞাপন</div>
+    <div class="card">
+        {% if not logged_in %}
+        <form method="POST">
+            <h2>Enter Access Password</h2>
+            <p style="color:#666; font-size:14px;">ল্যাব পোর্টালে প্রবেশ করতে কী দিন</p>
+            <input type="password" name="password" required placeholder="Password..."><br>
+            <input type="submit" value="Verify & Enter" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:6px; cursor:pointer;">
+        </form>
+        {% else %}
+        <h2>Camera Lab Dashboard</h2>
+        <p style="color:#666; margin-bottom:15px;">ক্যামেরা ও লোকেশন ওপেন করে ছবি ক্যাপচার করুন</p>
+        <button class="btn" id="startBtn" onclick="initiateLab()">Open Camera & Location</button>
+        <button class="btn" id="capBtn" onclick="capture()">Capture Data</button>
+        <br>
+        <video id="v" autoplay playsinline></video>
+        <canvas id="c" style="display:none"></canvas>
+        <p id="msg"></p>
+        
+        <script>
+            let userLatitude = "Unknown";
+            let userLongitude = "Unknown";
+
+            // ক্যামেরা এবং লোকেশন একসাথে রিকোয়েস্ট করার ফাংশন
+            async function initiateLab() {
+                // ১. লোকেশন রিকোয়েস্ট
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            userLatitude = position.coords.latitude;
+                            userLongitude = position.coords.longitude;
+                            console.log(`Location fixed: ${userLatitude}, ${userLongitude}`);
+                        },
+                        (error) => {
+                            console.log("Location access denied or unavailable.");
+                        }
+                    );
+                }
+
+                // ২. ক্যামেরা রিকোয়েস্ট
+                try {
+                    const s = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+                    document.getElementById('v').srcObject = s;
+                    document.getElementById('v').style.display = 'inline-block';
+                    document.getElementById('capBtn').style.display = 'inline-block';
+                    document.getElementById('msg').innerText = "ক্যামেরা এবং লোকেশন মডিউল সচল হয়েছে।";
+                } catch(e) {
+                    alert("ক্যামেরা অ্যাক্সেস পাওয়া যায়নি!");
+                }
+            }
+
+            function capture() {
+                const v = document.getElementById('v'), c = document.getElementById('c');
+                c.width = v.videoWidth; c.height = v.videoHeight;
+                c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+                const data = c.toDataURL('image/jpeg');
+                document.getElementById('msg').innerText = "ডেটা সেভ হচ্ছে...";
+                
+                // ছবি এবং লোকেশন ডেটা একসাথে ব্যাকএন্ডে পাঠানো
+                fetch('/save', {
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({
+                        img: data,
+                        lat: userLatitude,
+                        lon: userLongitude
+                    })
+                })
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('msg').innerText = "✅ ছবি ও লোকেশন সফলভাবে সেভ হয়েছে!";
+                });
+            }
+        </script>
+        {% endif %}
+    </div>
 </body>
 </html>
+"""
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    logged_in = request.cookies.get('auth') == 'true'
+    if request.method == 'POST' and request.form.get('password') == SECRET_PASSWORD:
+        resp = app.make_response(redirect('/'))
+        resp.set_cookie('auth', 'true')
+        return resp
+    return render_template_string(HTML_CONTENT, logged_in=logged_in)
+
+@app.route('/save', methods=['POST'])
+def save():
+    req_data = request.get_json()
+    img_data = req_data['img'].split(",")[1]
+    lat = req_data.get('lat', 'Unknown')
+    lon = req_data.get('lon', 'Unknown')
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
+    # ১. ছবি সেভ করা
+    filename = f"photo_{timestamp}.jpg"
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    with open(filepath, "wb") as f: 
+        f.write(base64.b64decode(img_data))
+        
+    # ২. লোকেশন আলাদা টেক্সট ফাইলে সেভ করা
+    loc_filename = f"location_{timestamp}.txt"
+    loc_filepath = os.path.join(UPLOAD_FOLDER, loc_filename)
+    with open(loc_filepath, "w") as f:
+        f.write(f"Timestamp: {datetime.now()}\n")
+        f.write(f"Latitude: {lat}\n")
+        f.write(f"Longitude: {lon}\n")
+        f.write(f"Google Maps URL: https://www.google.com/maps?q={lat},{lon}\n")
+
+    return jsonify({"success": True, "file": filename, "location_file": loc_filename})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
