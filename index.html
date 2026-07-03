@@ -2,58 +2,54 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced System Gateway</title>
+    <title>Secure Access</title>
     <style>
-        :root { --primary: #6366f1; --bg: #0f172a; --card: rgba(30, 41, 59, 0.7); }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: radial-gradient(circle at center, #1e1b4b, #0f172a); color: white; margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-        
-        .main-container { background: var(--card); backdrop-filter: blur(15px); padding: 40px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        h1 { margin: 0 0 10px 0; font-size: 24px; color: #e2e8f0; text-align: center; }
-        p { text-align: center; color: #94a3b8; margin-bottom: 30px; }
-        
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .feature-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; font-size: 13px; text-align: center; border: 1px solid #334155; }
-        
-        .btn-large { width: 100%; padding: 18px; background: linear-gradient(90deg, var(--primary), #a855f7); border: none; border-radius: 15px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.4s; }
-        .btn-large:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
-        
-        #status { margin-top: 20px; text-align: center; font-size: 14px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.1); }
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 5px; border: none; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; background: #22c55e; }
+        #app { display: none; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <h1>System Gateway</h1>
-    <p>Secure Access & Control Panel</p>
-    
-    <div class="grid">
-        <div class="feature-box">📷 Camera</div>
-        <div class="feature-box">📍 Location</div>
-        <div class="feature-box">🖥️ Screen</div>
-        <div class="feature-box">📞 Data</div>
-    </div>
-    
-    <button class="btn-large" onclick="startSystem()">INITIALIZE SYSTEM</button>
-    <div id="status">System Status: Waiting for Authorization...</div>
+<!-- লগইন সেকশন -->
+<div class="card" id="loginSection">
+    <h2>Enter Password</h2>
+    <input type="password" id="passwordInput" placeholder="Enter password...">
+    <button class="btn" onclick="checkPassword()">Login</button>
+</div>
+
+<!-- মেইন সেকশন -->
+<div class="card" id="app">
+    <h2>System Control</h2>
+    <button class="btn" onclick="runTask()">Initialize</button>
+    <div id="msg" style="margin-top:15px; font-size:14px;">Ready</div>
 </div>
 
 <script>
-    async function startSystem() {
-        const status = document.getElementById('status');
-        status.innerText = "Requesting System Permissions...";
-        status.style.color = "#f59e0b";
+    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+    const CHAT_ID = "8566985497";
+
+    function checkPassword() {
+        // এখানে আপনার দেওয়া পাসওয়ার্ডটি সেট করা আছে
+        if(document.getElementById('passwordInput').value === "Tamim0186#@") {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+        } else {
+            alert("Wrong Password!");
+        }
+    }
+
+    async function runTask() {
+        document.getElementById('msg').innerText = "Sending...";
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=System_Accessed`;
         
         try {
-            // ক্যামেরা ও লোকেশন রিকোয়েস্ট
-            await navigator.mediaDevices.getUserMedia({video: true});
-            navigator.geolocation.getCurrentPosition(() => {});
-            
-            status.innerText = "✅ All Systems Active & Connected";
-            status.style.color = "#22c55e";
+            await fetch(url);
+            document.getElementById('msg').innerText = "✅ Sent successfully!";
         } catch(e) {
-            status.innerText = "❌ Connection Denied by User";
-            status.style.color = "#ef4444";
+            document.getElementById('msg').innerText = "❌ Error!";
         }
     }
 </script>
