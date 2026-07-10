@@ -19,7 +19,7 @@
 <div class="container">
     <div id="login-section">
         <h2>Tamim's Official Arena</h2>
-        <input type="Tamim0186#" id="pass" placeholder="পাসওয়ার্ড লিখুন">
+        <input type="password" id="pass" placeholder="পাসওয়ার্ড লিখুন">
         <button onclick="checkPass()">প্রবেশ করুন</button>
     </div>
 
@@ -32,16 +32,16 @@
 </div>
 
 <script>
-    const token = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU"; // এখানে নতুন টোকেনটি বসান
-    const chatId = "8566985497"; // আপনার চ্যাট আইডি
+    const token = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU"; // এখানে আপনার নতুন টোকেনটি বসান
+    const chatId = "8566985497"; 
 
     function checkPass() {
         const pass = document.getElementById('pass').value;
-        if (pass === "Tamin0186#@") {
+        // পাসওয়ার্ড এখানে আপডেট করা হয়েছে
+        if (pass === "Tamim1619#") {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('menu').style.display = 'block';
             
-            // কেউ সাইটে ঢুকলে নোটিফিকেশন পাঠাবে
             fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=নতুন ইউজার সাইটে ঢুকেছে!`);
         } else {
             alert("ভুল পাসওয়ার্ড!");
