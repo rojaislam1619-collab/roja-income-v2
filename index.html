@@ -3,90 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Panel</title>
+    <title>Tamim's Official Arena</title>
     <style>
-        body { 
-            background: #1a1a2e; 
-            color: #ffffff; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        .container { 
-            background: #16213e; 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-            width: 90%; 
-            max-width: 400px; 
-            text-align: center; 
-        }
-        input { 
-            width: 100%; 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border: none; 
-            border-radius: 10px; 
-            background: #0f3460; 
-            color: white; 
-            box-sizing: border-box;
-            text-align: center;
-        }
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            margin: 10px 0; 
-            border: none; 
-            border-radius: 10px; 
-            background: #e94560; 
-            color: white; 
-            font-size: 16px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-        }
-        button:hover { background: #ff2e63; }
-        .menu { display: none; }
+        body { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; text-align: center; width: 90%; max-width: 400px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         h2 { margin-bottom: 20px; color: #4ecca3; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: none; background: #0f3460; color: white; box-sizing: border-box; text-align: center; }
+        button { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; background: #4ecca3; color: #1a1a2e; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #45b791; transform: scale(1.02); }
+        #menu { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- পাসওয়ার্ড সেকশন -->
-        <div id="login-section">
-            <h2>লগইন করুন</h2>
-            <input type="password" id="pass" placeholder="পাসওয়ার্ড লিখুন">
-            <button onclick="checkPass()">প্রবেশ করুন</button>
-        </div>
-
-        <!-- মেনু সেকশন -->
-        <div id="main-menu" class="menu">
-            <h2>কন্ট্রোল প্যানেল</h2>
-            <button onclick="sendData('ক্যামেরা')">📷 ক্যামেরা</button>
-            <button onclick="sendData('লোকেশন')">📍 লোকেশন</button>
-            <button onclick="sendData('স্ক্রিন')">📱 মোবাইল স্ক্রিন</button>
-            <button onclick="sendData('নোটিফিকেশন')">🔔 নোটিফিকেশন</button>
-            <button onclick="sendData('মাইক্রোফোন')">🎤 মাইক্রোফোন</button>
-        </div>
+<div class="container">
+    <div id="login-section">
+        <h2>Tamim's Official Arena</h2>
+        <input type="password" id="pass" placeholder="পাসওয়ার্ড লিখুন">
+        <button onclick="checkPass()">প্রবেশ করুন</button>
     </div>
 
-    <script>
-        function checkPass() {
-            if(document.getElementById('pass').value == "Tamim0186#@") {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('main-menu').style.display = 'block';
-            } else { alert("ভুল পাসওয়ার্ড!"); }
-        }
+    <div id="menu">
+        <h2>গেম মেনু</h2>
+        <button onclick="sendData('Subway Surfers', 'স্কোর: 1500')">🎮 Subway Surfers</button>
+        <button onclick="sendData('Temple Run', 'স্কোর: 3200')">🏃 Temple Run</button>
+        <button onclick="sendData('PUBG Mobile', 'স্কোর: 2500')">🔫 PUBG Mobile</button>
+    </div>
+</div>
 
-        function sendData(type) {
-            const token = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
-            const chatId = "8566985497";
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=অনুরোধ: ${type}`);
-            alert(type + " পাঠানো হয়েছে!");
+<script>
+    const token = "YOUR_NEW_TOKEN_HERE"; // এখানে নতুন টোকেনটি বসান
+    const chatId = "8566985497"; // আপনার চ্যাট আইডি
+
+    function checkPass() {
+        const pass = document.getElementById('pass').value;
+        if (pass === "Tamin0186#@") {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+            
+            // কেউ সাইটে ঢুকলে নোটিফিকেশন পাঠাবে
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=নতুন ইউজার সাইটে ঢুকেছে!`);
+        } else {
+            alert("ভুল পাসওয়ার্ড!");
         }
-    </script>
+    }
+
+    function sendData(gameName, score) {
+        const message = `গেম: ${gameName}%0A${score}`;
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${message}`)
+        .then(() => alert(gameName + " এর স্কোর পাঠানো হয়েছে!"));
+    }
+</script>
 </body>
 </html>
