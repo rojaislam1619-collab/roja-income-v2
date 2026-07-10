@@ -3,276 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamim's Official Arena</title>
+    <title>Tamim's Pro Gaming Arena</title>
     <style>
-        /* প্রিমিয়াম ব্যাকগ্রাউন্ড ও লুক */
-        body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #4ecca3;
-            text-shadow: 0 0 10px rgba(78, 204, 163, 0.5);
-            margin-bottom: 30px;
-        }
-
-        /* গেম কন্টেইনার ও গ্লাস ডিজাইন */
-        .game-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            margin: 20px 0;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-
-        .game-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #4ecca3;
-        }
-
-        /* গেম স্ক্রিন ক্যানভাস */
-        canvas {
-            background: #0f172a;
-            border-radius: 10px;
-            border: 2px solid #334155;
-            display: block;
-            margin: 0 auto;
-            max-width: 100%;
-        }
-
-        /* কন্ট্রোল বাটন */
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #4ecca3;
-            color: #1a1a2e;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: #45b791;
-            transform: scale(1.05);
-        }
-
-        .score-display {
-            font-size: 16px;
-            margin-top: 10px;
-            color: #cbd5e1;
-        }
+        :root { --primary: #4ecca3; --dark: #1a1a2e; }
+        body { background: radial-gradient(circle, #16213e, #1a1a2e); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .card { background: rgba(255, 255, 255, 0.08); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; width: 100%; max-width: 500px; margin-bottom: 20px; }
+        button { background: var(--primary); border: none; padding: 15px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin: 5px; }
+        button:hover { box-shadow: 0 0 15px var(--primary); transform: scale(1.05); }
+        textarea { width: 90%; height: 80px; border-radius: 10px; padding: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <h1>Tamim's Official Arena</h1>
+<div class="card">
+    <h1>Tamim's Pro Arena</h1>
+    <p>আপনার পছন্দের গেমটি বেছে নিন</p>
+    <button onclick="logGame('ক্লিক মাস্টার')">⚡ ক্লিক মাস্টার</button>
+    <button onclick="logGame('কালার পাজল')">🎨 কালার পাজল</button>
+</div>
 
-    <!-- গেম ১: ক্লিক রেসিং (গাড়ি রেস) -->
-    <div class="game-card">
-        <div class="game-title">🏎️ কার স্পিড রেসার</div>
-        <p style="font-size: 14px; color: #aaa;">যত দ্রুত সম্ভব বাটনে ক্লিক করে গাড়ি এগিয়ে নিন!</p>
-        <canvas id="carCanvas" width="400" height="150"></canvas>
-        <div class="score-display">আপনার স্কোর: <span id="carScore">0</span></div>
-        <div class="controls">
-            <button onclick="playCarGame()">গাড়ি চালান! (Click)</button>
-            <button onclick="resetCarGame()" style="background: #ef4444; color: white;">রিসেট</button>
-        </div>
-    </div>
-
-    <!-- গেম ২: বেলুন ফুটানো পপ গেম -->
-    <div class="game-card">
-        <div class="game-title">🎈 বেলুন ফুটানো চ্যালেঞ্জ</div>
-        <p style="font-size: 14px; color: #aaa;">ক্যানভাসের ভেতরের বেলুনটির ওপর ক্লিক করে ফুটান!</p>
-        <canvas id="balloonCanvas" width="400" height="250"></canvas>
-        <div class="score-display">ফুটানো বেলুন: <span id="balloonScore">0</span></div>
-        <div class="controls">
-            <button onclick="resetBalloonGame()" style="background: #ef4444; color: white;">রিসেট</button>
-        </div>
-    </div>
-
-    <!-- গেম ৩: ব্লক জাম্পার (সাবওয়ে স্টাইল) -->
-    <div class="game-card">
-        <div class="game-title">🏃 ব্লক জাম্পার (রানার)</div>
-        <p style="font-size: 14px; color: #aaa;">বাধা এড়িয়ে লাফ দিন!</p>
-        <canvas id="jumpCanvas" width="400" height="200"></canvas>
-        <div class="score-display">স্কোর: <span id="jumpScore">0</span></div>
-        <div class="controls">
-            <button onclick="cubeJump()">লাফ দিন (Jump)</button>
-            <button onclick="startJumpGame()" style="background: #3b82f6; color: white;">শুরু করুন</button>
-        </div>
-    </div>
+<div class="card" id="update-section">
+    <h3>📢 নতুন আপডেট চাই?</h3>
+    <textarea id="user-request" placeholder="আপনার প্রয়োজনীয় আপডেট বা মতামত এখানে লিখুন..."></textarea><br>
+    <button onclick="sendUpdateRequest()">আপডেট পাঠান</button>
+</div>
 
 <script>
-    // টেলিগ্রাম কনফিগারেশন
-    const token = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU"; 
-    const chatId = "6420303571"; 
+    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+    const CHAT_ID = "6420303571";
 
-    // সাইটে ঢোকার সাথে সাথে নোটিফিকেশন
-    window.onload = function() {
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=নতুন ইউজার গেম খেলতে এসেছে!`);
-        initCarGame();
-        initBalloonGame();
-        initJumpGame();
-    };
-
-    function sendTelegramScore(gameName, score) {
-        const message = `গেম: ${gameName}%0Aঅর্জিত স্কোর: ${score}`;
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${message}`);
+    // গেমের অ্যাকশন লগিং
+    function logGame(gameName) {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=ইউজার গেম খেলছে: ${gameName}`);
+        alert(gameName + " শুরু হয়েছে!");
     }
 
-    // ==========================================
-    // ১. কার রেসিং গেম লজিক
-    // ==========================================
-    let carCanvas, carCtx, carX = 20, carScore = 0;
-    function initCarGame() {
-        carCanvas = document.getElementById("carCanvas");
-        carCtx = carCanvas.getContext("2d");
-        drawCar();
-    }
-    function drawCar() {
-        carCtx.clearRect(0, 0, carCanvas.width, carCanvas.height);
-        // রাস্তা
-        carCtx.fillStyle = "#334155";
-        carCtx.fillRect(0, 60, carCanvas.width, 30);
-        // গাড়ি (লাল রঙের ব্লক)
-        carCtx.fillStyle = "#ef4444";
-        carCtx.fillRect(carX, 65, 40, 20);
-        // ফিনিশ লাইন
-        carCtx.fillStyle = "#f59e0b";
-        carCtx.fillRect(360, 60, 10, 30);
-    }
-    function playCarGame() {
-        if(carX < 350) {
-            carX += 15;
-            carScore += 100;
-            document.getElementById("carScore").innerText = carScore;
-            drawCar();
-            if(carX >= 350) {
-                alert("অভিনন্দন! আপনি ফিনিশ লাইনে পৌঁছেছেন।");
-                sendTelegramScore("কার স্পিড রেসার", carScore);
-            }
-        }
-    }
-    function resetCarGame() {
-        carX = 20; carScore = 0;
-        document.getElementById("carScore").innerText = carScore;
-        drawCar();
+    // নতুন আপডেট বা মতামত পাঠানোর ফাংশন
+    function sendUpdateRequest() {
+        const msg = document.getElementById('user-request').value;
+        if(msg.trim() === "") return alert("দয়া করে কিছু লিখুন!");
+        
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=নতুন আপডেট রিকোয়েস্ট: ${msg}`);
+        alert("আপনার মতামত পাঠানো হয়েছে! আমি শীঘ্রই রিপ্লাই দেবো।");
+        document.getElementById('user-request').value = "";
     }
 
-    // ==========================================
-    // ২. বেলুন ফুটানো গেম লজিক
-    // ==========================================
-    let ballCanvas, ballCtx, ballX = 200, ballY = 125, ballRadius = 25, ballScore = 0;
-    function initBalloonGame() {
-        ballCanvas = document.getElementById("balloonCanvas");
-        ballCtx = ballCanvas.getContext("2d");
-        drawBalloon();
-        ballCanvas.addEventListener("click", function(event) {
-            const rect = ballCanvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            const dist = Math.sqrt((x - ballX)**2 + (y - ballY)**2);
-            if(dist < ballRadius) {
-                ballScore += 1;
-                document.getElementById("balloonScore").innerText = ballScore;
-                ballX = Math.random() * (ballCanvas.width - 50) + 25;
-                ballY = Math.random() * (ballCanvas.height - 50) + 25;
-                drawBalloon();
-                if(ballScore % 5 === 0) {
-                    sendTelegramScore("বেলুন ফুটানো চ্যালেঞ্জ", ballScore);
-                }
-            }
-        });
-    }
-    function drawBalloon() {
-        ballCtx.clearRect(0, 0, ballCanvas.width, ballCanvas.height);
-        ballCtx.beginPath();
-        ballCtx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-        ballCtx.fillStyle = "#3b82f6";
-        ballCtx.fill();
-        ballCtx.closePath();
-    }
-    function resetBalloonGame() {
-        ballScore = 0;
-        document.getElementById("balloonScore").innerText = ballScore;
-        ballX = 200; ballY = 125;
-        drawBalloon();
-    }
+    // ২ ঘণ্টা পর মেসেজ/এলিমেট অটো-ডিলিট সিস্টেম
+    // এখানে আমরা একটি মেকানিজম সেট করছি যা ২ ঘণ্টা (৭২০০০০০ মিলি সেকেন্ড) পর এলিমেন্ট হাইড করবে
+    setTimeout(() => {
+        document.getElementById('update-section').style.display = 'none';
+        console.log("পুরানো আপডেট সেকশন মুছে ফেলা হয়েছে।");
+    }, 7200000); 
 
-    // ==========================================
-    // ৩. ব্লক জাম্পার গেম লজিক
-    // ==========================================
-    let jCanvas, jCtx, playerY = 160, playerJump = false, jumpCount = 0, obstacleX = 400, jScore = 0, jInterval;
-    function initJumpGame() {
-        jCanvas = document.getElementById("jumpCanvas");
-        jCtx = jCanvas.getContext("2d");
-        drawJumpScene();
-    }
-    function drawJumpScene() {
-        jCtx.clearRect(0, 0, jCanvas.width, jCanvas.height);
-        // মাটি
-        jCtx.fillStyle = "#1e293b";
-        jCtx.fillRect(0, 180, jCanvas.width, 20);
-        // প্লেয়ার (সবুজ)
-        jCtx.fillStyle = "#10b981";
-        jCtx.fillRect(40, playerY, 20, 20);
-        // বাধা (লাল)
-        jCtx.fillStyle = "#f43f5e";
-        jCtx.fillRect(obstacleX, 160, 15, 20);
-    }
-    function startJumpGame() {
-        clearInterval(jInterval);
-        obstacleX = 400; jScore = 0; playerY = 160;
-        document.getElementById("jumpScore").innerText = jScore;
-        jInterval = setInterval(updateJumpGame, 20);
-    }
-    function updateJumpGame() {
-        if (playerJump) {
-            jumpCount++;
-            if (jumpCount <= 15) playerY -= 6;
-            else if (jumpCount <= 30) playerY += 6;
-            else { playerJump = false; jumpCount = 0; playerY = 160; }
-        }
-        obstacleX -= 4;
-        if (obstacleX < -15) {
-            obstacleX = 400;
-            jScore += 10;
-            document.getElementById("jumpScore").innerText = jScore;
-        }
-        // কোলিশন চেক
-        if (obstacleX > 40 && obstacleX < 60 && playerY >= 140) {
-            clearInterval(jInterval);
-            alert("গেম ওভার! আপনার স্কোর: " + jScore);
-            sendTelegramScore("ব্লক জাম্পার রানার", jScore);
-        }
-        drawJumpScene();
-    }
-    function cubeJump() {
-        if (!playerJump) playerJump = true;
-    }
 </script>
+
 </body>
 </html>
