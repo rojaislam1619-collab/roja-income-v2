@@ -2,58 +2,41 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tamim's Official Arena</title>
     <style>
-        body { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; text-align: center; width: 90%; max-width: 400px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { margin-bottom: 20px; color: #4ecca3; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: none; background: #0f3460; color: white; box-sizing: border-box; text-align: center; }
-        button { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; background: #4ecca3; color: #1a1a2e; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #45b791; transform: scale(1.02); }
-        #menu { display: none; }
+        body { background: #1a1a2e; color: white; text-align: center; font-family: sans-serif; padding: 20px; }
+        .game-box { margin: 20px auto; border: 2px solid #4ecca3; border-radius: 10px; overflow: hidden; width: 100%; max-width: 600px; }
+        iframe { width: 100%; height: 400px; border: none; }
+        h2 { color: #4ecca3; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="login-section">
-        <h2>Tamim's Official Arena</h2>
-        <input type="password" id="pass" placeholder="পাসওয়ার্ড লিখুন">
-        <button onclick="checkPass()">প্রবেশ করুন</button>
+    <h2>Tamim's Official Arena - গেম খেলুন</h2>
+
+    <!-- গেম ১: গাড়ি রেসিং -->
+    <div class="game-box">
+        <p>কার রেসিং গেম</p>
+        <iframe src="https://html5.gamedistribution.com/rvv829/index.html"></iframe>
     </div>
 
-    <div id="menu">
-        <h2>গেম মেনু</h2>
-        <button onclick="sendData('কার রেসিং গেম 🏎️')">🏎️ কার রেসিং</button>
-        <button onclick="sendData('বেলুন ফুটানো গেম 🎈')">🎈 বেলুন ফুটানো</button>
-        <button onclick="sendData('সাবওয়ে সার্ফার্স 🏃')">🏃 সাবওয়ে সার্ফার্স</button>
+    <!-- গেম ২: বেলুন ফুটানো -->
+    <div class="game-box">
+        <p>বেলুন ফুটানো গেম</p>
+        <iframe src="https://html5.gamedistribution.com/f9c1e7/index.html"></iframe>
     </div>
-</div>
 
-<script>
-    const token = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU"; 
-    const chatId = "6420303571"; 
+    <!-- গেম ৩: সাবওয়ে সার্ফার্স -->
+    <div class="game-box">
+        <p>সাবওয়ে সার্ফার্স</p>
+        <iframe src="https://html5.gamedistribution.com/f75a6c/index.html"></iframe>
+    </div>
 
-    function checkPass() {
-        const pass = document.getElementById('pass').value;
-        if (pass === "Tamim1619#") {
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('menu').style.display = 'block';
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=নতুন ইউজার সাইটে ঢুকেছে!`);
-        } else {
-            alert("ভুল পাসওয়ার্ড!");
-        }
-    }
-
-    function sendData(gameName) {
-        let score = prompt(gameName + " এ আপনি কত স্কোর করেছেন?");
-        if (score !== null && score !== "") {
-            const message = `গেম: ${gameName}%0Aস্কোর: ${score}`;
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${message}`)
-            .then(() => alert("আপনার স্কোর পাঠানো হয়েছে!"));
-        }
-    }
-</script>
+    <script>
+        // ইউজার সাইটে ঢুকলেই বটে মেসেজ যাবে
+        const token = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+        const chatId = "6420303571";
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=নতুন ইউজার গেম খেলতে এসেছে!`);
+    </script>
 </body>
 </html>
