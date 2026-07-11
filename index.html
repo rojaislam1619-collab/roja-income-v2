@@ -2,62 +2,76 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Tamim's Quiz Arena</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamim's Pro Quiz Arena</title>
     <style>
-        body { background: #1a1a2e; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .quiz-card { background: #16213e; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; border: 2px solid #4ecca3; }
-        button { display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: none; background: #4ecca3; cursor: pointer; font-weight: bold; }
-        button:hover { background: #45b791; }
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; text-align: center; border: 2px solid #4ecca3; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        button { display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: none; background: #4ecca3; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #45b791; transform: scale(1.02); }
     </style>
 </head>
 <body>
 
-<div class="quiz-card" id="quiz-box">
+<div class="box" id="quiz-container">
     <h2 id="question">প্রশ্ন লোড হচ্ছে...</h2>
-    <div id="options"></div>
+    <div id="buttons"></div>
     <p>স্কোর: <span id="score">0</span></p>
+    <button onclick="location.reload()" style="background: #ef4444;">আবার শুরু করুন</button>
 </div>
 
 <script>
-    // হাজার হাজার প্রশ্ন এখানে যোগ করুন
+    // এখানে আপনার প্রশ্নগুলো সাজানো থাকবে। 
+    // প্রতিটি প্রশ্নে 'correct' এর জায়গায় একটি array (লিস্ট) ব্যবহার করেছি যাতে দুটি উত্তর দেওয়া যায়।
     const questions = [
-        { q: "বাংলাদেশের রাজধানী কী?", options: ["ঢাকা", "চট্টগ্রাম", "সিলেট"], a: "ঢাকা" },
-        { q: "সূর্য কোন দিকে ওঠে?", options: ["পূর্ব", "পশ্চিম", "উত্তর"], a: "পূর্ব" },
-        { q: "মানুষের শরীরে কয়টি হার?", options: ["২০৬", "২১০", "২০০"], a: "২০৬" }
+        { 
+            q: "বাংলাদেশের দুটি বিভাগের নাম বলুন?", 
+            correct: ["ঢাকা", "চট্টগ্রাম"], 
+            wrong: ["কলকাতা", "দিল্লি"] 
+        },
+        { 
+            q: "দুটি ফলের নাম সিলেক্ট করুন:", 
+            correct: ["আম", "জাম"], 
+            wrong: ["পেঁয়াজ", "আলু"] 
+        }
     ];
 
     let currentQ = 0;
     let score = 0;
-    const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
-    const CHAT_ID = "6420303571";
 
-    function loadQuestion() {
-        if(currentQ < questions.length) {
-            document.getElementById("question").innerText = questions[currentQ].q;
-            const optDiv = document.getElementById("options");
-            optDiv.innerHTML = "";
-            questions[currentQ].options.forEach(opt => {
+    function loadQuiz() {
+        if (currentQ < questions.length) {
+            let q = questions[currentQ];
+            document.getElementById("question").innerText = q.q;
+            let btnsDiv = document.getElementById("buttons");
+            btnsDiv.innerHTML = "";
+
+            // সব উত্তর এক করে মিশিয়ে দেওয়া
+            let allAnswers = [...q.correct, ...q.wrong];
+            allAnswers.sort(() => Math.random() - 0.5);
+
+            allAnswers.forEach(ans => {
                 let btn = document.createElement("button");
-                btn.innerText = opt;
-                btn.onclick = () => checkAnswer(opt);
-                optDiv.appendChild(btn);
+                btn.innerText = ans;
+                btn.onclick = () => {
+                    if (q.correct.includes(ans)) {
+                        score += 10;
+                        document.getElementById("score").innerText = score;
+                        alert("সঠিক উত্তর!");
+                    } else {
+                        alert("ভুল উত্তর!");
+                    }
+                    currentQ++;
+                    loadQuiz();
+                };
+                btnsDiv.appendChild(btn);
             });
         } else {
-            document.getElementById("quiz-box").innerHTML = `<h2>কুইজ শেষ! মোট স্কোর: ${score}</h2>`;
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=ইউজার কুইজ শেষ করেছে। মোট স্কোর: ${score}`);
+            document.getElementById("quiz-container").innerHTML = `<h2>কুইজ শেষ! আপনার মোট স্কোর: ${score}</h2>`;
         }
     }
 
-    function checkAnswer(ans) {
-        if(ans === questions[currentQ].a) {
-            score += 10;
-            document.getElementById("score").innerText = score;
-        }
-        currentQ++;
-        loadQuestion();
-    }
-
-    loadQuestion();
+    loadQuiz();
 </script>
 </body>
 </html>
