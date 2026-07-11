@@ -2,60 +2,62 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamim's Pro Gaming Arena</title>
+    <title>Tamim's Quiz Arena</title>
     <style>
-        :root { --primary: #4ecca3; --dark: #1a1a2e; }
-        body { background: radial-gradient(circle, #16213e, #1a1a2e); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: rgba(255, 255, 255, 0.08); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; width: 100%; max-width: 500px; margin-bottom: 20px; }
-        button { background: var(--primary); border: none; padding: 15px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; margin: 5px; }
-        button:hover { box-shadow: 0 0 15px var(--primary); transform: scale(1.05); }
-        textarea { width: 90%; height: 80px; border-radius: 10px; padding: 10px; margin-top: 10px; }
+        body { background: #1a1a2e; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .quiz-card { background: #16213e; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; border: 2px solid #4ecca3; }
+        button { display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: none; background: #4ecca3; cursor: pointer; font-weight: bold; }
+        button:hover { background: #45b791; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>Tamim's Pro Arena</h1>
-    <p>আপনার পছন্দের গেমটি বেছে নিন</p>
-    <button onclick="logGame('ক্লিক মাস্টার')">⚡ ক্লিক মাস্টার</button>
-    <button onclick="logGame('কালার পাজল')">🎨 কালার পাজল</button>
-</div>
-
-<div class="card" id="update-section">
-    <h3>📢 নতুন আপডেট চাই?</h3>
-    <textarea id="user-request" placeholder="আপনার প্রয়োজনীয় আপডেট বা মতামত এখানে লিখুন..."></textarea><br>
-    <button onclick="sendUpdateRequest()">আপডেট পাঠান</button>
+<div class="quiz-card" id="quiz-box">
+    <h2 id="question">প্রশ্ন লোড হচ্ছে...</h2>
+    <div id="options"></div>
+    <p>স্কোর: <span id="score">0</span></p>
 </div>
 
 <script>
+    // হাজার হাজার প্রশ্ন এখানে যোগ করুন
+    const questions = [
+        { q: "বাংলাদেশের রাজধানী কী?", options: ["ঢাকা", "চট্টগ্রাম", "সিলেট"], a: "ঢাকা" },
+        { q: "সূর্য কোন দিকে ওঠে?", options: ["পূর্ব", "পশ্চিম", "উত্তর"], a: "পূর্ব" },
+        { q: "মানুষের শরীরে কয়টি হার?", options: ["২০৬", "২১০", "২০০"], a: "২০৬" }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
     const BOT_TOKEN = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
     const CHAT_ID = "6420303571";
 
-    // গেমের অ্যাকশন লগিং
-    function logGame(gameName) {
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=ইউজার গেম খেলছে: ${gameName}`);
-        alert(gameName + " শুরু হয়েছে!");
+    function loadQuestion() {
+        if(currentQ < questions.length) {
+            document.getElementById("question").innerText = questions[currentQ].q;
+            const optDiv = document.getElementById("options");
+            optDiv.innerHTML = "";
+            questions[currentQ].options.forEach(opt => {
+                let btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt);
+                optDiv.appendChild(btn);
+            });
+        } else {
+            document.getElementById("quiz-box").innerHTML = `<h2>কুইজ শেষ! মোট স্কোর: ${score}</h2>`;
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=ইউজার কুইজ শেষ করেছে। মোট স্কোর: ${score}`);
+        }
     }
 
-    // নতুন আপডেট বা মতামত পাঠানোর ফাংশন
-    function sendUpdateRequest() {
-        const msg = document.getElementById('user-request').value;
-        if(msg.trim() === "") return alert("দয়া করে কিছু লিখুন!");
-        
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=নতুন আপডেট রিকোয়েস্ট: ${msg}`);
-        alert("আপনার মতামত পাঠানো হয়েছে! আমি শীঘ্রই রিপ্লাই দেবো।");
-        document.getElementById('user-request').value = "";
+    function checkAnswer(ans) {
+        if(ans === questions[currentQ].a) {
+            score += 10;
+            document.getElementById("score").innerText = score;
+        }
+        currentQ++;
+        loadQuestion();
     }
 
-    // ২ ঘণ্টা পর মেসেজ/এলিমেট অটো-ডিলিট সিস্টেম
-    // এখানে আমরা একটি মেকানিজম সেট করছি যা ২ ঘণ্টা (৭২০০০০০ মিলি সেকেন্ড) পর এলিমেন্ট হাইড করবে
-    setTimeout(() => {
-        document.getElementById('update-section').style.display = 'none';
-        console.log("পুরানো আপডেট সেকশন মুছে ফেলা হয়েছে।");
-    }, 7200000); 
-
+    loadQuestion();
 </script>
-
 </body>
 </html>
