@@ -3,57 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Tips Zone | Official</title>
+    <title>Smart Tips Hub | Official</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center font-sans p-4">
+<body class="bg-slate-950 text-white min-h-screen p-4 md:p-10">
 
-    <!-- মেইন বক্স -->
-    <div id="mainContent" class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Smart Tips Zone</h1>
-            <p class="text-slate-400 mt-2 text-sm">অফিসিয়াল পোর্টালে স্বাগতম</p>
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Smart Tips Hub</h1>
+            <p class="text-slate-400 mt-2">আপনার প্রতিদিনের প্রযুক্তি সমাধান</p>
         </div>
 
-        <form id="loginForm" class="space-y-4">
-            <input type="text" id="userName" required placeholder="আপনার নাম লিখুন"
-                class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-white">
-            
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition duration-300 shadow-lg shadow-blue-900/20">
-                প্রবেশ করুন
-            </button>
-        </form>
+        <!-- Tips Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            <button onclick="showTip('Computer')" class="p-6 bg-slate-900 border border-slate-800 rounded-2xl hover:border-blue-500 transition">💻 কম্পিউটার</button>
+            <button onclick="showTip('Mobile')" class="p-6 bg-slate-900 border border-slate-800 rounded-2xl hover:border-blue-500 transition">📱 মোবাইল</button>
+            <button onclick="showTip('TV')" class="p-6 bg-slate-900 border border-slate-800 rounded-2xl hover:border-blue-500 transition">📺 টিভি</button>
+        </div>
+
+        <!-- Display Area -->
+        <div id="tipDisplay" class="p-8 bg-slate-900 rounded-3xl border border-slate-800 mb-10 hidden">
+            <h2 id="tipTitle" class="text-xl font-bold text-blue-400 mb-4"></h2>
+            <p id="tipContent" class="text-slate-300 leading-relaxed"></p>
+        </div>
+
+        <!-- Feedback / Update Request Section -->
+        <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800">
+            <h3 class="text-lg font-bold mb-4">নতুন আপডেটের অনুরোধ বা সমস্যা জানান</h3>
+            <textarea id="feedback" placeholder="আপনার সমস্যা বা আপডেটের আইডিয়া এখানে লিখুন..." class="w-full p-4 bg-slate-800 rounded-xl border border-slate-700 outline-none mb-4"></textarea>
+            <button onclick="sendFeedback()" class="w-full py-4 bg-emerald-600 rounded-xl font-bold hover:bg-emerald-700 transition">পাঠিয়ে দিন</button>
+        </div>
     </div>
 
     <script>
-        // এখানে যাদের নাম লিখবেন তারা ব্যান হয়ে যাবে
-        const bannedUsers = ["ব্যান.Hossin", "ব্যান.Tamim"];
-                        
+        const tips = {
+            'Computer': "কম্পিউটার স্লো হলে অপ্রয়োজনীয় সফটওয়্যার আনইনস্টল করুন এবং স্টার্টআপ অ্যাপস বন্ধ রাখুন।",
+            'Mobile': "ফোন হ্যাং করলে ক্যাশ মেমোরি ক্লিয়ার করুন এবং সফটওয়্যার আপডেট রাখুন।",
+            'TV': "টিভি চালু না হলে পাওয়ার কেবল চেক করুন এবং রিমোটের ব্যাটারি পরিবর্তন করুন।"
+        };
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('userName').value;
+        function showTip(category) {
+            document.getElementById('tipDisplay').classList.remove('hidden');
+            document.getElementById('tipTitle').innerText = category + " টিপস";
+            document.getElementById('tipContent').innerText = tips[category];
+        }
 
-            // ব্যান চেক
-            if (bannedUsers.includes(name)) {
-                document.body.innerHTML = `
-                    <div class="text-center p-10 bg-slate-900 rounded-3xl border border-red-500/30">
-                        <h2 class="text-2xl font-bold text-red-500 mb-2">অ্যাক্সেস ডিনাইড!</h2>
-                        <p class="text-slate-400">আপনাকে সাইট থেকে ব্যান করে দেওয়া হয়েছে।</p>
-                    </div>`;
-                return;
-            }
-            
-            // নোটিফিকেশন লজিক
+        function sendFeedback() {
+            const text = document.getElementById('feedback').value;
             const botToken = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
             const chatId = "6420303571";
-            const message = `🚀 নতুন ভিজিটর: ${name}`;
-
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
-            .then(() => {
-                alert("স্বাগতম, " + name + "! আপনি সফলভাবে প্রবেশ করেছেন।");
-            });
-        });
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent('ফিডব্যাক/সমস্যা: ' + text)}`);
+            alert("আপনার মেসেজটি আমাদের কাছে পৌঁছেছে। ধন্যবাদ!");
+        }
     </script>
 </body>
 </html>
