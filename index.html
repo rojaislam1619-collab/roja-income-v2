@@ -1,77 +1,34 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamim's Pro Quiz Arena</title>
-    <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; text-align: center; border: 2px solid #4ecca3; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        button { display: block; width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: none; background: #4ecca3; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #45b791; transform: scale(1.02); }
-    </style>
+    <title>আমাদের আড্ডা রুম</title>
 </head>
 <body>
+    <h1>লুডু ও আড্ডা রুম</h1>
+    <input type="text" id="username" placeholder="আপনার নাম লিখুন">
+    <button onclick="joinRoom()">রুমে প্রবেশ করুন (ক্যামেরা ও মাইকসহ)</button>
 
-<div class="box" id="quiz-container">
-    <h2 id="question">প্রশ্ন লোড হচ্ছে...</h2>
-    <div id="buttons"></div>
-    <p>স্কোর: <span id="score">0</span></p>
-    <button onclick="location.reload()" style="background: #ef4444;">আবার শুরু করুন</button>
-</div>
+    <div id="video-container"></div>
 
-<script>
-    // এখানে আপনার প্রশ্নগুলো সাজানো থাকবে। 
-    // প্রতিটি প্রশ্নে 'correct' এর জায়গায় একটি array (লিস্ট) ব্যবহার করেছি যাতে দুটি উত্তর দেওয়া যায়।
-    const questions = [
-        { 
-            q: "বাংলাদেশের দুটি বিভাগের নাম বলুন?", 
-            correct: ["ঢাকা", "চট্টগ্রাম"], 
-            wrong: ["কলকাতা", "দিল্লি"] 
-        },
-        { 
-            q: "দুটি ফলের নাম সিলেক্ট করুন:", 
-            correct: ["আম", "জাম"], 
-            wrong: ["পেঁয়াজ", "আলু"] 
+    <script>
+        async function joinRoom() {
+            const name = document.getElementById('username').value;
+            if(!name) return alert("নাম লিখুন");
+
+            // ১. ক্যামেরা ও মাইক্রোফোন এক্সেস
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('video-container').innerHTML = "<video autoplay playsinline muted></video>";
+            document.querySelector('video').srcObject = stream;
+
+            // ২. টেলিগ্রাম বোটে নোটিফিকেশন পাঠানো (আপনার বোট টোকেন ও চ্যাট আইডি বসান)
+            const botToken = "YOUR_BOT_TOKEN_HERE";
+            const chatId = "YOUR_CHAT_ID_HERE";
+            const message = `🚨 নতুন বন্ধু রুমে ঢুকেছে: ${name}`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`);
+            
+            alert("রুমে সফলভাবে যুক্ত হয়েছেন!");
         }
-    ];
-
-    let currentQ = 0;
-    let score = 0;
-
-    function loadQuiz() {
-        if (currentQ < questions.length) {
-            let q = questions[currentQ];
-            document.getElementById("question").innerText = q.q;
-            let btnsDiv = document.getElementById("buttons");
-            btnsDiv.innerHTML = "";
-
-            // সব উত্তর এক করে মিশিয়ে দেওয়া
-            let allAnswers = [...q.correct, ...q.wrong];
-            allAnswers.sort(() => Math.random() - 0.5);
-
-            allAnswers.forEach(ans => {
-                let btn = document.createElement("button");
-                btn.innerText = ans;
-                btn.onclick = () => {
-                    if (q.correct.includes(ans)) {
-                        score += 10;
-                        document.getElementById("score").innerText = score;
-                        alert("সঠিক উত্তর!");
-                    } else {
-                        alert("ভুল উত্তর!");
-                    }
-                    currentQ++;
-                    loadQuiz();
-                };
-                btnsDiv.appendChild(btn);
-            });
-        } else {
-            document.getElementById("quiz-container").innerHTML = `<h2>কুইজ শেষ! আপনার মোট স্কোর: ${score}</h2>`;
-        }
-    }
-
-    loadQuiz();
-</script>
+    </script>
 </body>
 </html>
