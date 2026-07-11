@@ -5,49 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Tips Zone | Official</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-    </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center font-sans p-4">
 
-    <div class="w-full max-w-md bg-white border border-slate-200 rounded-lg p-10 shadow-sm">
-        <!-- Header -->
+    <!-- মেইন বক্স -->
+    <div id="mainContent" class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
         <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-slate-800">Smart Tips Zone</h1>
-            <p class="text-slate-500 mt-1 text-sm font-medium">অফিসিয়াল পোর্টাল</p>
+            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Smart Tips Zone</h1>
+            <p class="text-slate-400 mt-2 text-sm">অফিসিয়াল পোর্টালে স্বাগতম</p>
         </div>
 
-        <!-- Form -->
-        <form id="loginForm" class="space-y-5">
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">আপনার নাম</label>
-                <input type="text" id="userName" required 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded focus:border-slate-400 focus:outline-none transition">
-            </div>
+        <form id="loginForm" class="space-y-4">
+            <input type="text" id="userName" required placeholder="আপনার নাম লিখুন"
+                class="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-white">
             
-            <button type="submit" 
-                class="w-full bg-slate-900 hover:bg-black text-white font-semibold py-3 rounded transition duration-200">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition duration-300 shadow-lg shadow-blue-900/20">
                 প্রবেশ করুন
             </button>
         </form>
     </div>
 
     <script>
+        // এখানে যাদের নাম লিখবেন তারা ব্যান হয়ে যাবে
+        const bannedUsers = ["ব্যান.Hossin", "ব্যান.Tamim"];
+                        
+
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('userName').value;
+
+            // ব্যান চেক
+            if (bannedUsers.includes(name)) {
+                document.body.innerHTML = `
+                    <div class="text-center p-10 bg-slate-900 rounded-3xl border border-red-500/30">
+                        <h2 class="text-2xl font-bold text-red-500 mb-2">অ্যাক্সেস ডিনাইড!</h2>
+                        <p class="text-slate-400">আপনাকে সাইট থেকে ব্যান করে দেওয়া হয়েছে।</p>
+                    </div>`;
+                return;
+            }
             
+            // নোটিফিকেশন লজিক
             const botToken = "8853221737:AAHDigRYNltTvdFGZW4gZahuu3M9dlJHENU";
             const chatId = "6420303571";
-            const message = `🏢 নতুন ভিজিটর: ${name}`;
+            const message = `🚀 নতুন ভিজিটর: ${name}`;
 
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
             .then(() => {
-                alert("স্বাগতম! আপনি আমাদের পোর্টালে যুক্ত হয়েছেন।");
-            })
-            .catch(error => {
-                console.error('Error:', error);
+                alert("স্বাগতম, " + name + "! আপনি সফলভাবে প্রবেশ করেছেন।");
             });
         });
     </script>
